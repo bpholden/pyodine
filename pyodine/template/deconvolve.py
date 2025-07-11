@@ -297,7 +297,8 @@ class ChunkedDeconvolver():
         
         logging.info('Deconvolving chunks...')
         
-        bar = ProgressBar(max_value=len(self.ostar_chunks), redirect_stdout=True)
+        bar = ProgressBar(maxval=len(self.ostar_chunks))
+        bar.start()
         bar.update(0)
 
         for i in range(len(self.ostar_chunks)):

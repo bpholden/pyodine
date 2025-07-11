@@ -18,7 +18,7 @@ import sys
 
 def model_all_chunks(chunks, chunk_weight, fitter, lmfit_params, 
                      tellurics=None, use_chauvenet=True, compute_redchi2=True, 
-                     use_progressbar=True, live=False):
+                     use_progressbar=False, live=False):
     """Loop over all chunks and model them
     
     :params chunks: The chunks of the observation to model.
@@ -75,7 +75,8 @@ def model_all_chunks(chunks, chunk_weight, fitter, lmfit_params,
     
     # Use a progressbar?
     if use_progressbar:
-        bar = ProgressBar(max_value=len(chunks), redirect_stdout=True)
+        bar = ProgressBar(maxval=len(chunks))
+        bar.start()
         bar.update(0)
     
     for i, chunk in enumerate(chunks):

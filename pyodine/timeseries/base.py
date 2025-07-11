@@ -387,7 +387,8 @@ class CombinedResults():
         self.medcnts = np.zeros((self.nr_files, self.nr_chunks))
         
         # Set up progressbar
-        bar = ProgressBar(max_value=self.nr_files, redirect_stdout=True)
+        bar = ProgressBar(maxval=self.nr_files)
+        bar.start()
         bar.update(0)
         # Now load the results from all files and fill up the object properties,
         # again making sure about the file formats
