@@ -40,31 +40,31 @@ class Parameters:
     specify and alter input parameter descriptions for the model, e.g. set
     bounds or fix parameters.
     """
-    
+
     def __init__(self):
-        
+
         # Setup the logging if not existent yet
         if not logging.getLogger().hasHandlers():
             logging.basicConfig(stream=sys.stdout, level=logging.INFO, 
                                 format='%(message)s')
-        
+
         # General parameters:
         #self.print_terminal = True             # Print messages to the terminal
         self.osample_obs = 4                    # Oversample factor for the observation modeling
         self.lsf_conv_width = 6.                # LSF is evaluated over this many pixels (times 2)
         self.number_cores = 12                  # Number of processor cores for multiprocessing
-        
+
         self.log_config_file = os.path.join(utilities_dir_path, 'logging.json')   # The logging config file
         self.log_level = logging.INFO           # The logging level used for console and info file
-        
+
         self.use_progressbar = False            # Use a progressbar during chunk modelling?
-        
+
         # Tellurics:
-        self.telluric_mask = None               # Telluric mask to use (carmenes, uves or hitran); 
+        self.telluric_mask = None               # Telluric mask to use (carmenes, uves or hitran);
                                                 # (None: tellurics are not taken care of)
         self.tell_wave_range = (None,6500)      # Load tellurics only within this wavelength range
         self.tell_dispersion = 0.002            # Dispersion (i.e. wavelength grid) of telluric mask
-        
+
         # Chunking: Which algorithm to use?
         # (currently supported: 'auto_wave_comoving')
         self.chunking_algorithm = 'auto_wave_comoving'
@@ -76,33 +76,33 @@ class Parameters:
         self.chunk_width = 40                   # Width of chunks in pixels in observation modeling
         self.chunk_padding = 6                  # Padding (left and right) of the chunks in pixels
         self.chunks_per_order = None            # Maximum number of chunks per order (optional)
-        self.chunk_delta_v = None               # Velocity shift between template and observation 
+        self.chunk_delta_v = None               # Velocity shift between template and observation
                                                 # (None: relative barycentric velocity)
-        
+
         # Reference spectrum to use in normalizer and for the first velocity guess
         self.ref_spectrum = 'arcturus'          # Reference spectrum ('arcturus' or 'sun')
         self.velgues_order_range = (2,15)       # Orders used for velocity guess (should be outside I2 region)
         self.delta_v = 1000.                    # The velocity step size for the cross-correlation (in m/s)
         self.maxlag  = 10000                    # The number of steps to each side in the cross-correlation
-        
+
         # Normalize chunks in the beginning?
         self.normalize_chunks = False
-        
+
         # Weighting of pixels:
         self.bad_pixel_mask = False             # Whether to run the bad pixel mask
         self.bad_pixel_cutoff = 0.22            # Cutoff parameter for the bad pixel mask
         self.correct_obs = False                # Whether to correct the observation in regions of weight = 0
         self.weight_type = 'flat'               # Type of weights (flat or inverse, as implemented in pyodine.components.Spectrum)
         self.rel_noise = 0.008                  # Only used if weight_type='inverse': The relative noise within a flatfield spectrum
-        
+
         # I2 atlas:
         self.i2_to_use = 2                      # Index of I2 FTS to use (see archive/conf.py)
         self.wavelength_scale = 'air'           # Which wavelength scale to use ('air' or 'vacuum' - should always be the first)
-        
+
         # If you want to create and save velocity analysis plots, put in the desired
         # run number here (these results will be plotted) - else put to None
         self.vel_analysis_plots = -1            # -1 corresponds to the last run
-        
+
         # Now to the run info: For each modelling run, define a new entry in the following dictionary
         # with all the neccessary information needed
         # (except fitting parameters, those are defined further below in constrain_parameters())
@@ -249,10 +249,10 @@ class Parameters:
         :return: The updated list of :class:`lmfit.Parameters` objects.
         :rtype: list[:class:`lmfit.Parameters`]
         """
-        
+
         logging.info('')
         logging.info('Constraining parameters for RUN {}'.format(run_id))
-        
+
         ###########################################################################
         # RUN 0
         # Mainly there for first wavelength solution to feed into the next runs.
@@ -271,12 +271,12 @@ class Parameters:
                 
                 # Constrain the iodine to not become negative (just in case)
                 lmfit_params[i]['iod_depth'].set(min=0.1)
-                
+
                 # If the chunks were normalized beforehand:
                 # Fix the continuum slope to 0
                 #lmfit_params[i]['cont_slope'].set(
                 #        value=0., vary=False)
-        
+
         ###########################################################################
         # RUN 1
         # A full model now, with the full LSF description (constrained?!).
